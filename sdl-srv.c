@@ -30,6 +30,21 @@
 #include	"devdraw.h"
 
 #define	HANDLER(type)	((type >> 1) - 1)
+
+static void	handle_rdmouse(Wsysmsg *);
+static void	handle_moveto(Wsysmsg *);
+static void	handle_cursor(Wsysmsg *);
+static void	handle_bouncemouse(Wsysmsg *);
+static void	handle_rdkbd(Wsysmsg *);
+static void	handle_label(Wsysmsg *);
+static void	handle_init(Wsysmsg *);
+static void	handle_rdsnarf(Wsysmsg *);
+static void	handle_wrsnarf(Wsysmsg *);
+static void	handle_rddraw(Wsysmsg *);
+static void	handle_wrdraw(Wsysmsg *);
+static void	handle_top(Wsysmsg *);
+static void	handle_resize(Wsysmsg *);
+
 void	(*handlers[])(Wsysmsg *)	= {
 	[HANDLER(Trdmouse)]	= &handle_rdmouse,
 	[HANDLER(Tmoveto)]	= &handle_moveto,
