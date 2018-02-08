@@ -31,6 +31,12 @@
 
 #define	HANDLER(type)	((type >> 1) - 1)
 
+#define	DEFAULT_WINW	640
+#define	DEFAULT_WINH	480
+#define	DEFAULT_WINFLAGS	SDL_WINDOW_RESIZABLE
+
+SDL_Window	*win;
+
 static void	handle_rdmouse(Wsysmsg *);
 static void	handle_moveto(Wsysmsg *);
 static void	handle_cursor(Wsysmsg *);
@@ -60,6 +66,42 @@ void	(*handlers[])(Wsysmsg *)	= {
 	[HANDLER(Ttop)]	= &handle_top,
 	[HANDLER(Tresize)]	= &handle_resize
 };
+
+void
+handle_init(Wsysmsg *msg)
+{
+	int x, y, w, h;
+
+	if (!SDL_Init(SDL_INIT_VIDEO)) {
+		replysdlerr(msg);
+		return;
+	}
+
+	x = y = SDL_WINDOWPOS_UNDEFINED;
+	w = DEFAULT_WINW;
+	h = DEFUALT_WIN3;;
+	if (*msg->winsize) {
+		Rectangle r;
+		int havemin;
+
+		if (parsewinsize(msg->winsize, &r, &havemin) < 0) {
+			replyerrstr(msg);
+			return;
+		}
+		if (havemin) {
+			x = r.min.x;
+			y = r.min.y;
+		}
+		w = Dx(r);
+		h = Dy(r);
+	}
+	if (!(win = SDL_CreateWindow(msg->label, x, y, w, h, DEFAULT_WINFLAGS))) {
+		replysdlerr(msg);
+		return;
+	}
+
+	reply(msg);
+}
 
 void
 main(int argc, char *argv[])
