@@ -68,6 +68,13 @@ void	(*handlers[])(Wsysmsg *)	= {
 };
 
 void
+handle_label(Wsysmsg *msg)
+{
+	SDL_SetWindowTitle(win, msg->label);
+	reply(msg);
+}
+
+void
 handle_init(Wsysmsg *msg)
 {
 	int x, y, w, h;
