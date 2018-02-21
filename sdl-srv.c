@@ -111,6 +111,13 @@ handle_init(Wsysmsg *msg)
 }
 
 void
+handle_resize(Wsysmsg *msg)
+{
+	SDL_SetWindowSize(win, Dx(msg->rect), Dy(msg->rect));
+	reply(msg);
+}
+
+void
 main(int argc, char *argv[])
 {
 	uchar	*buf;
