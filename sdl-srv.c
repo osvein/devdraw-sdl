@@ -37,6 +37,10 @@
 
 SDL_Window	*win;
 
+static void	reply(Wsysmsg *msg);
+static void	replyerrstr(Wsysmsg *msg);
+static void	replyerrsdl(Wsysmsg *msg);
+
 static void	handle_rdmouse(Wsysmsg *);
 static void	handle_moveto(Wsysmsg *);
 static void	handle_cursor(Wsysmsg *);
@@ -68,6 +72,44 @@ void	(*handlers[])(Wsysmsg *)	= {
 };
 
 void
+reply(Wsysmsg *msg)
+{
+	static uchar	*buf;
+	static int	nbuf;
+	uint n;
+
+	msg->type |= 1;
+	if ((n = sizeW2M(msg)) > nbuf) {
+		free(buf);
+		if (!(buf = malloc(nbuf = n)))
+			sysfatal("malloc: %r");
+	}
+	convW2M(msg, buf, n);
+	if (write(1, buf, n) != n)
+		sysfatal("write: %r");
+}
+
+void
+replyerrstr(Wsysmsg *msg)
+{
+	char	err[ERRMAX];
+
+	rerrstr(err, sizeof(err));
+	msg->type = Rerror;
+	msg->error = err;
+	reply(msg);
+}
+
+void
+replyerrsdl(Wsysmsg *msg)
+{
+	msg->type = Rerror;
+	msg->error = SDL_GetError();
+	reply(msg);
+	SDL_ClearError();
+}
+
+void
 handle_label(Wsysmsg *msg)
 {
 	SDL_SetWindowTitle(win, msg->label);
@@ -80,7 +122,7 @@ handle_init(Wsysmsg *msg)
 	int x, y, w, h;
 
 	if (!SDL_Init(SDL_INIT_VIDEO)) {
-		replysdlerr(msg);
+		replyerrsdl(msg);
 		return;
 	}
 
@@ -103,7 +145,7 @@ handle_init(Wsysmsg *msg)
 		h = Dy(r);
 	}
 	if (!(win = SDL_CreateWindow(msg->label, x, y, w, h, DEFAULT_WINFLAGS))) {
-		replysdlerr(msg);
+		replyerrsdl(msg);
 		return;
 	}
 
