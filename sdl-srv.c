@@ -117,6 +117,25 @@ handle_moveto(Wsysmsg *msg)
 }
 
 void
+handle_cursor(Wsysmsg *msg)
+{
+	SDL_FreeCursor(SDL_GetCursor()); /* cursor will be reset to default as a side effect */
+	if (!msg->arrowcursor) {
+		Cursor	*cur;
+		SDL_Cursor	*sdlcur;
+
+		cur = &msg->cursor;
+		sdlcur = SDL_CreateCursor(cur->set, cur->clr, 16, 16, cur->offset.x, cur->offset.y);
+		if (!sdlcur) {
+			replyerrsdl(msg);
+			return;
+		}
+		SDL_SetCursor(sdlcur);
+	}
+	reply(msg);
+}
+
+void
 handle_label(Wsysmsg *msg)
 {
 	SDL_SetWindowTitle(win, msg->label);
