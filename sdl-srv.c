@@ -110,6 +110,13 @@ replyerrsdl(Wsysmsg *msg)
 }
 
 void
+handle_moveto(Wsysmsg *msg)
+{
+	SDL_WarpMouseInWindow(win, msg->mouse.xy.x, msg->mouse.xy.y);
+	reply(msg);
+}
+
+void
 handle_label(Wsysmsg *msg)
 {
 	SDL_SetWindowTitle(win, msg->label);
