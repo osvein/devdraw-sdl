@@ -154,7 +154,7 @@ handle_init(Wsysmsg *msg)
 
 	x = y = SDL_WINDOWPOS_UNDEFINED;
 	w = DEFAULT_WINW;
-	h = DEFUALT_WIN3;;
+	h = DEFAULT_WINH;
 	if (*msg->winsize) {
 		Rectangle r;
 		int havemin;
