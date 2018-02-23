@@ -23,6 +23,9 @@
 #include	<u.h>
 #include	<libc.h>
 #include	<draw.h>
+#include	<cursor.h>
+#include	<memdraw.h>
+#include	<mouse.h>
 #include	<drawfcall.h>
 
 #include	<SDL.h>
