@@ -184,10 +184,12 @@ handle_init(Wsysmsg *msg)
 void
 handle_rdsnarf(Wsysmsg *msg)
 {
-	if (msg->snarf = SDL_GetClipboardText())
+	if (msg->snarf = SDL_GetClipboardText()) {
 		reply(msg);
-	else
+		SDL_free(msg->snarf);
+	} else {
 		replyerrsdl(msg);
+	}
 }
 
 void
