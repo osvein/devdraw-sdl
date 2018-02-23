@@ -191,6 +191,15 @@ handle_rdsnarf(Wsysmsg *msg)
 }
 
 void
+handle_wrsnarf(Wsysmsg *msg)
+{
+	if (SDL_SetClipboardText(msg->snarf))
+		replyerrsdl(msg);
+	else
+		reply(msg);
+}
+
+void
 handle_top(Wsysmsg *msg)
 {
 	SDL_RaiseWindow(win);
