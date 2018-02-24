@@ -38,6 +38,8 @@
 #define	DEFAULT_WINH	480
 #define	DEFAULT_WINFLAGS	SDL_WINDOW_RESIZABLE
 
+#define	BUFSZ_RDDRAW	0x10000
+
 SDL_Window	*win;
 
 static void	reply(Wsysmsg *msg);
@@ -199,6 +201,20 @@ handle_wrsnarf(Wsysmsg *msg)
 		replyerrsdl(msg);
 	else
 		reply(msg);
+}
+
+void
+handle_rddraw(Wsysmsg *msg)
+{
+	uchar	buf[BUFSZ_RDDRAW];
+
+	msg->data = buf;
+	if (msg->count > sizeof(buf))
+		msg->count = sizeof(buf);
+	if ((msg->count = _drawmsgread(buf, msg->count)) >= 0)
+		reply(msg);
+	else
+		replyerrstr(msg);
 }
 
 void
