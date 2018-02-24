@@ -175,12 +175,10 @@ handle_init(Wsysmsg *msg)
 		w = Dx(r);
 		h = Dy(r);
 	}
-	if (!(win = SDL_CreateWindow(msg->label, x, y, w, h, DEFAULT_WINFLAGS))) {
+	if (win = SDL_CreateWindow(msg->label, x, y, w, h, DEFAULT_WINFLAGS))
+		reply(msg);
+	else
 		replyerrsdl(msg);
-		return;
-	}
-
-	reply(msg);
 }
 
 void
