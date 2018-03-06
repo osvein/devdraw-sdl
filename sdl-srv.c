@@ -40,8 +40,6 @@
 
 #define	BUFSZ_RDDRAW	0x10000
 
-SDL_Window	*win;
-
 static void	reply(Wsysmsg *msg);
 static void	replyerrstr(Wsysmsg *msg);
 static void	replyerrsdl(Wsysmsg *msg);
@@ -75,6 +73,8 @@ void	(*handlers[])(Wsysmsg *)	= {
 	[HANDLER(Ttop)]	= &handle_top,
 	[HANDLER(Tresize)]	= &handle_resize
 };
+
+SDL_Window	*win;
 
 void
 reply(Wsysmsg *msg)
