@@ -38,7 +38,26 @@
 #define	DEFAULT_WINH	480
 #define	DEFAULT_WINFLAGS	SDL_WINDOW_RESIZABLE
 
+#define	BUFSZ_EVTQ	32
 #define	BUFSZ_RDDRAW	0x10000
+
+typedef	union Evt	Evt;
+typedef	struct Evtq	Evtq;
+
+union	Evt {
+};
+
+struct	Evtq {
+	uint	ri, wi;
+	int	dir;	/* content type: >0 tags, 0 empty, <0 evts */
+	union {
+		uchar	tag;
+		Evt	evt;
+	}	buf[BUFSZ_EVTQ];
+};
+
+static uint	matchtag(Evtq, uchar, Evt *);
+static uint	matchevt(Evtq, Evt, uchar *);
 
 static void	reply(Wsysmsg *msg);
 static void	replyerrstr(Wsysmsg *msg);
@@ -75,6 +94,56 @@ void	(*handlers[])(Wsysmsg *)	= {
 };
 
 SDL_Window	*win;
+
+uint
+matchtag(Evtq q, uchar tag, Evt *evt)
+{
+	if (q.dir < 0) {
+		*evt = q.buf[q.ri].evt;
+		if (++q.ri >= nelem(q.buf))
+			q.ri = 0;
+		if (q.ri == q.wi)
+			q.dir = 0;
+		return 1;
+	} else {
+		if (q.wi == q.ri) {
+			Wsysmsg	err;
+
+			err.tag = q.buf[q.wi].tag;
+			err.type = Rerror;
+			err.error = "tag queue overflow";
+			reply(&err);
+			if (++q.ri >= nelem(q.buf))
+				q.ri = 0;
+		}
+		q.buf[q.wi].tag = tag;
+		if (++q.wi >= nelem(q.buf))
+			q.wi = 0;
+		q.dir = 1;
+		return 0;
+	}
+}
+
+uint
+matchevt(Evtq q, Evt evt, uchar *tag)
+{
+	if (q.dir > 0) {
+		*tag = q.buf[q.ri].tag;
+		if (++q.ri >= nelem(q.buf))
+			q.ri = 0;
+		if (q.ri == q.wi)
+			q.dir = 0;
+		return 1;
+	} else {
+		if (q.wi == q.ri && ++q.ri >= nelem(q.buf))
+			q.ri = 0;
+		q.buf[q.wi].evt = evt;
+		if (++q.wi >= nelem(q.buf))
+			q.wi = 0;
+		q.dir = -1;
+		return 0;
+	}
+}
 
 void
 reply(Wsysmsg *msg)
