@@ -287,7 +287,7 @@ handle_rddraw(Wsysmsg *msg)
 void
 handle_wrdraw(Wsysmsg *msg)
 {
-	if (_drawmsgwrite(m->data, m->count) >= 0)
+	if (_drawmsgwrite(msg->data, msg->count) >= 0)
 		reply(msg);
 	else
 		replyerrstr(msg);
