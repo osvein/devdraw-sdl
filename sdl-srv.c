@@ -45,6 +45,7 @@ typedef	union Evt	Evt;
 typedef	struct Evtq	Evtq;
 
 union	Evt {
+	Rune	kbd;
 };
 
 struct	Evtq {
@@ -94,6 +95,8 @@ void	(*handlers[])(Wsysmsg *)	= {
 };
 
 SDL_Window	*win;
+
+Evtq	kbdq;
 
 uint
 matchtag(Evtq q, uchar tag, Evt *evt)
@@ -207,6 +210,17 @@ handle_cursor(Wsysmsg *msg)
 		SDL_SetCursor(sdlcur);
 	}
 	reply(msg);
+}
+
+void
+handle_rdkbd(Wsysmsg *msg)
+{
+	Evt	evt;
+
+	if (matchtag(kbdq, msg->tag, &evt)) {
+		msg->rune = evt.kbd;
+		reply(msg);
+	}
 }
 
 void
