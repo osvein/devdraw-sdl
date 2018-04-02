@@ -221,11 +221,6 @@ handle_init(Wsysmsg *msg)
 {
 	int x, y, w, h;
 
-	if (!SDL_Init(SDL_INIT_VIDEO)) {
-		replyerrsdl(msg);
-		return;
-	}
-
 	x = y = SDL_WINDOWPOS_UNDEFINED;
 	w = DEFAULT_WINW;
 	h = DEFAULT_WINH;
@@ -317,6 +312,9 @@ main(int argc, char *argv[])
 	ARGBEGIN {
 	defualt:
 	} ARGEND
+
+	if (SDL_Init(SDL_INIT_VIDEO) < 0)
+		sysfatal("failed to initialize SDL: %s", SDL_GetError());
 
 	buf = malloc(nbuf = 4);
 	while (read(1, buf, 4) == 4) {
